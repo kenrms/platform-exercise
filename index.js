@@ -1,14 +1,13 @@
-const express = require('express')
-const bodyParser = require('body-parser')
-const { promisify } = require('util')
+const express = require('express');
 
-const app = express()
-app.use(bodyParser.json)
+const app = express();
 
-const startServer = async () => {
-  const port = process.env.SERVER_PORT || 3000
-  await promisify(app.listen).bind(app)(port)
-  console.log(`Listening on port ${port}`)
-}
+const port = process.env.SERVER_PORT || 3000
 
-startServer()
+app.get('/', (req, res) => {
+  res.send('Hi there');
+});
+
+app.listen(port, () => {
+  console.log('Running on port ' + port);
+});
