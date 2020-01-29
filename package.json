@@ -1,15 +1,20 @@
 {
   "name": "fender-api-challenge",
   "version": "1.0.0",
-  "description": "UToken-based API",
+  "description": "Token-based API",
   "main": "index.js",
   "scripts": {
-    "test": "standard --fix"
+    "lint": "eslint .",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Ken Ramos",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.16.3"
+    "express": "^4.16.4"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.20.0"
+  }
 }
