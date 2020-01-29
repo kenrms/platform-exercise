@@ -4,8 +4,15 @@
   "description": "UToken-based API",
   "main": "index.js",
   "scripts": {
-    "test": "standard"
+    "test": "standard --fix"
   },
   "author": "Ken Ramos",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.3",
+    "util": "^0.11.0"
+  },
+  "devDependencies": {
+    "standard": "^11.0.1"
+  }
 }
