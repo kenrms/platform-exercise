@@ -1,0 +1,11 @@
+{
+  "name": "fender-api-challenge",
+  "version": "1.0.0",
+  "description": "UToken-based API",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard"
+  },
+  "author": "Ken Ramos",
+  "license": "ISC"
+}
