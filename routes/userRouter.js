@@ -67,6 +67,14 @@ function routes(User) {
         }
         return res.json(user);
       });
+    })
+    .delete((req, res) => {
+      req.user.remove((err) => {
+        if (err) {
+          return res.send(err);
+        }
+        res.sendStatus(204);
+      });
     });
 
   return userRouter;
