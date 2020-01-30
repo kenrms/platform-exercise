@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 const express = require('express');
 
 function routes(User) {
@@ -19,13 +20,30 @@ function routes(User) {
       });
     });
 
+  userRouter.use('/users/:userId', (req, res, next) => {
+    User.findById(req.params.userId, (err, user) => {
+      if (err) { return res.send(err); }
+      if (user) {
+        req.user = user;
+        return next();
+      }
+      return res.sendStatus(404);
+    });
+  });
+
   userRouter.route('/users/:userId')
-    .get((req, res) => {
-      User.findById(req.params.userId, (err, user) => {
-        if (err) { return res.send(err); }
-        return res.json(user);
-      })
-    })
+    .get((req, res) => res.json(req.user))
+    .put((req, res) => {
+      const { user } = req;
+      
+      user.name = req.body.name;
+      user.email = req.body.email;
+      user.password = req.body.password;
+      // TODO other fields and validation for updating
+
+      user.save();
+      res.json(user);
+    });
 
   return userRouter;
 }
