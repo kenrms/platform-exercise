@@ -1,47 +1,86 @@
-# Fender Digital Platform Engineering Challenge
 
-## Description
+# Token-based RESTful user authentication
 
-Design and implement a RESTful web service to facilitate a user authentication system. The authentication mechanism should be *token based*. Requests and responses should be in **JSON**.
+## Hi there 👋🏻
+This is my submission for this coding project. I chose to implement this using JWT-based authentication using Node.js, Express.js, and MongoDB. My reasoning is because they are simple environments to set up and start developing for quickly, so I could focus on the actual implementation. The model is kept simple (only the required fields with no additional models), and user passwords are hashed using bcrypt.
 
-## Requirements
+## Let's get started
 
-**Models**
+### Setup
+- Install MongoDB
+	- run `mongod` in a separate terminal for the API to use, or make sure it's running as a service
+	- I used v4.2.3
+- Install Node.js
+	- I used v12.14.1
+- Run `npm install` in project folder to install node dependencies
 
-The **User** model should have the following properties (at minimum):
+### Run
 
-1. name
-2. email
-3. password
+- Run the server with `> npm start`
+	> [nodemon] restarting due to changes...
+	> [nodemon] starting `node app.js`
+	> Running on port 3000...
+	> Connected to mongo!
 
-You should determine what, *if any*, additional models you will need.
+### Tests
+- run `> npm test` to run the mocha unit test suite (only 1 simple test implemented as a proof of concept)
 
-**Endpoints**
+## If I had more time...
+- More unit tests!! Every path in every controller should have a test.
+- Actually implement all the validation rules for registration and login.
+- Integration tests for some common user stories
+- More security -- per-user salts for password hashing, token expiry and blacklist for invalidated or compromised tokens
+- Logging - CRUD operations, exceptions, etc. to keep track of what's actually going on
+- Authorization/permissions -- what access does each user have? What differentiates an admin from a normal user? Could be an enum-like field, or even as granular as a bitmask for each user.
+- The `DELETE` endpoint shouldn't normally delete a db record in practice, but instead do something like set a Deleted field.
 
-All of these endpoints should be written from a user's perspective.
 
-1. **User** Registration
-2. Login (*token based*) - should return a token, given *valid* credentials
-3. Logout - logs a user out
-4. Update a **User**'s Information
-5. Delete a **User**
+## Models
+ **User**
+ 1. name
+ 2. email
+ 3. password  
 
-**README**
+## Endpoints
+1. `POST /api/register` -- User Registration
 
-Please include:
-- a readme file that explains your thinking
-- how to setup and run the project
-- if you chose to use a database, include instructions on how to set that up
-- if you have tests, include instructions on how to run them
-- a description of what enhancements you might make if you had more time.
+	* Request body contains relevant registration information:
+		>       {
+		> 		 	"name": "Les Claypool",
+		> 		 	"email": "lclaypool@primus.com",
+		> 		 	"password": "jerrywasaracecardriver"
+		> 		}
+	* Response returns a JWT token:
+		>       {
+		> 		 	"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1ZTMyNjg1NTJhNTQ5NTEwNTQyMGRkZWMifQ._L0-DuVuCHM2-jdHXWKYLcZSaGV-oaYkokFVjsh03zE"
+		> 		}
 
-**Additional Info**
+2. `POST /api/login` -- Login 
 
-- We expect this project to take a few hours to complete
-- You can use Rails/Sinatra, Python, Go, node.js or shiny-new-framework X, as long as you tell us why you chose it and how it was a good fit for the challenge. 
-- Feel free to use whichever database you'd like; we suggest Postgres. 
-- Bonus points for security, specs, etc. 
-- Do as little or as much as you like.
+	* Request body should contain login information:
+		>       {
+		> 		 	"email": "lclaypool@primus.com",
+		> 		 	"password": "jerrywasaracecardriver"
+		> 		}
+	* Response returns a JWT token for the user:
+		>       {
+		> 		 	"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1ZTMyNjg1NTJhNTQ5NTEwNTQyMGRkZWMifQ._L0-DuVuCHM2-jdHXWKYLcZSaGV-oaYkokFVjsh03zE"
+		> 		}
+		
+3. **Logout** is not implemented for the purpose of this simple authentication because the client can simply delete their copy of the token or wait for it to expire.
 
-Please fork this repo and commit your code into that fork.  Show your work and process through those commits.
+4. `PATCH /api/users` -- Update a user's information
 
+	* Header should contain **Authorization** with user's JWT token
+		* *e.g.* `Authorization Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1ZTMyNWY3YTE4ZDIxOTM3MmM1NmI1ODEifQ.xj2y8UlYnsFDrw71fzc9Pra1T7G_Sd17uIK8XWRGNXg`
+	* Body should contain any fields that the user desires to update
+		>       {
+		>         "name": "John the Fisherman",
+		> 		 	"password": "shakehandswithbeef"
+		> 		}
+	* Returns **204** on success, otherwise a **400** with relevant error information
+
+5. `DELETE /api/users` -- Delete a user
+	* Header should contain **Authorization** with user's JWT token
+		* *e.g.* `Authorization Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1ZTMyNWY3YTE4ZDIxOTM3MmM1NmI1ODEifQ.xj2y8UlYnsFDrw71fzc9Pra1T7G_Sd17uIK8XWRGNXg`
+	* Returns **204** on success, otherwise a **400** with relevant error information
