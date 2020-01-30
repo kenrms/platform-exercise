@@ -5,12 +5,15 @@ function authUtils() {
   const TOKEN_SECRET = process.env.TOKEN_SECRET || 'verySecretSecret';
 
   /* eslint-disable no-unused-vars */
-  function validateNewUser(userData) {
-    // TODO validation
+  function validateNewUser(userData, next) {
+    // TODO finish all validation rules
     // name - not empty, minimum length
+
     // email - length and regex to validate email format, ensure email doesn't already exist
+    if (!userData.email) { return next('Email is required'); }
+
     // password - business rules and restrictions (length, character whitelist, minimum strength)
-    return true;
+    return next();
   }
 
   function checkAuth(req, res, next) {

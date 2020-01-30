@@ -5,14 +5,15 @@ function userController(User) {
   function register(req, res) {
     const user = new User(req.body);
 
-    if (!validateNewUser(user)) {
-      res.status(400).send({ message: 'Invalid registration data' });
-    }
+    validateNewUser(user, (err) => {
+      if (err) {
+        res.status(400);
+        return res.send(err);
+      }
 
-    user.save((err, newUser) => {
-      if (err) { return res.send(err); }
-
-      return res.status(201).json({ token: generateToken(newUser) });
+      user.save();
+      res.status(201);
+      return res.json({ token: generateToken(user) });
     });
   }
 
