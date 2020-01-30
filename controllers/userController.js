@@ -41,8 +41,8 @@ function userController(User) {
 
   async function update(req, res) {
     await User.findById(req.userId, (findError, user) => {
-      if (findError) {
-        res.send(400).json({ message: 'User not found' });
+      if (findError || !user) {
+        return res.status(400).json({ message: 'User not found' });
       }
 
       if (req.body._id) {

@@ -11,9 +11,10 @@ const port = process.env.PORT || 3000;
 
 mongoose.Promise = Promise;
 mongoose.connect('mongodb://localhost/userAPI', { useNewUrlParser: true, useUnifiedTopology: true }, (err) => {
-  if (!err) {
-    console.log('Connected to mongo...');
+  if (err) {
+    return console.error('Error connecting to mongo. Make sure you have mongod running');
   }
+  return console.log('Connected to mongo!');
 });
 
 app.use(bodyParser.urlencoded({ extended: true }));
