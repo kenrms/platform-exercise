@@ -1,5 +1,6 @@
 const express = require('express');
 const jwt = require('jwt-simple');
+const bcrypt = require('bcrypt-nodejs');
 
 function routes(User) {
   const router = express.Router();
@@ -16,27 +17,35 @@ function routes(User) {
       user.save((err, result) => {
         if (err) { return res.send(err); }
 
-        res.status(201).json(user);
+        return res.status(201).json(user);
       });
     })
 
   router.route('/login')
     .post(async (req, res) => {
-      var userData = req.body;
+      var loginData = req.body;
 
-      var user = await User.findOne({ email: userData.email });
+      var user = await User.findOne({ email: loginData.email });
 
-      if (!user || userData.password !== user.password) {
-        return res.sendStatus(401).send({ message: 'Email or Password invalid' });
+      if (!user) {
+        return res.sendStatus(401).send({ message: 'Email invalid' });
       }
 
-      // generate token
-      var payload = {};
-      var token = jwt.encode(payload, 'mysecret');  // secret should come from config or something (env?)
+      bcrypt.compare(loginData.password, user.password, (err, isMatch) => {
+        if (err) {
+          return res.sendStatus(500);
+        }
 
-      console.log(token);
+        if (!isMatch) {
+          return res.sendStatus(401);
+        }
 
-      res.json({token});
+        // generate token
+        var payload = {};
+        var token = jwt.encode(payload, 'mysecret');  // secret should come from config or something (env?)
+
+        return res.json({ token });
+      });
     })
 
   // debug -- check list of users
