@@ -7,14 +7,14 @@ const User = require('./models/userModel');
 const userRouter = require('./routes/userRouter');
 
 const app = express();
-const db = mongoose.connect('mongodb://localhost/userAPI', { useNewUrlParser: true, useUnifiedTopology: true }, (err) => {
+const port = process.env.PORT || 3000;
+
+mongoose.Promise = Promise;
+mongoose.connect('mongodb://localhost/userAPI', { useNewUrlParser: true, useUnifiedTopology: true }, (err) => {
   if (!err) {
     console.log('Connected to mongo...');
   }
 });
-const port = process.env.PORT || 3000;
-
-mongoose.Promise = Promise;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());

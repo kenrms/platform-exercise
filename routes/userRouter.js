@@ -1,8 +1,9 @@
+/* eslint-disable no-underscore-dangle */
 const express = require('express');
 const jwt = require('jwt-simple');
 const bcrypt = require('bcrypt-nodejs');
 
-const TOKEN_SECRET = '123'; // TODO this should come from env or some config
+const TOKEN_SECRET = process.env.TOKEN_SECRET || 'fallbackSecret';
 
 function routes(User) {
   function checkAuth(req, res, next) {
@@ -11,8 +12,8 @@ function routes(User) {
     }
 
     try {
-      var token = req.header('authorization').split(' ')[1];
-      var payload = jwt.decode(token, TOKEN_SECRET);
+      const token = req.header('authorization').split(' ')[1];
+      const payload = jwt.decode(token, TOKEN_SECRET);
 
       if (!payload) {
         return res.status(401).json({ message: 'Invalid Authorization header' });
@@ -21,18 +22,17 @@ function routes(User) {
       req.userId = payload.sub;
 
       return next();
-    }
-    catch (ex) {
-      console.error(ex);
+    } catch (ex) {
       return res.status(500).json({ message: ex.message });
     }
   }
 
   function generateToken(user) {
-    var payload = { sub: user._id };
+    const payload = { sub: user._id };
     return jwt.encode(payload, TOKEN_SECRET);
   }
 
+  /* eslint-disable no-unused-vars */
   function validateNewUser(userData) {
     // TODO validation
     // name - not empty, minimum length
@@ -48,7 +48,7 @@ function routes(User) {
       const user = new User(req.body);
 
       if (!validateNewUser(user)) {
-        res.status(400).send({ message: "Invalid registration data" });
+        res.status(400).send({ message: 'Invalid registration data' });
       }
 
       user.save((err, newUser) => {
@@ -60,15 +60,15 @@ function routes(User) {
 
   router.route('/login')
     .post(async (req, res) => {
-      var loginData = req.body;
+      const loginData = req.body;
 
-      var user = await User.findOne({ email: loginData.email });
+      const user = await User.findOne({ email: loginData.email });
 
       if (!user) {
         return res.status(401).send({ message: 'Email invalid' });
       }
 
-      bcrypt.compare(loginData.password, user.password, (err, isMatch) => {
+      return bcrypt.compare(loginData.password, user.password, (err, isMatch) => {
         if (err) {
           return res.status(500).json({ message: 'Error comparing passwords' });
         }
@@ -85,7 +85,7 @@ function routes(User) {
     .patch(checkAuth, async (req, res) => {
       await User.findById(req.userId, (findError, user) => {
         if (findError) {
-          res.send(400).json({ message: 'User not found' })
+          res.send(400).json({ message: 'User not found' });
         }
 
         if (req.body._id) {
@@ -97,6 +97,7 @@ function routes(User) {
           const key = item[0];
           const value = item[1];
 
+          /* eslint-disable no-param-reassign */
           user[key] = value;
         });
 
@@ -109,13 +110,12 @@ function routes(User) {
       });
     })
     .delete(checkAuth, async (req, res) => {
-
       await User.findById(req.userId, (findError, user) => {
         if (findError || !user) {
-          return res.status(400).json({ message: 'User not found' })
+          return res.status(400).json({ message: 'User not found' });
         }
 
-        user.remove((removeError) => {
+        return user.remove((removeError) => {
           if (removeError) {
             return res.send(removeError);
           }

@@ -12,22 +12,22 @@ const userModel = new Schema(
   }
 );
 
-userModel.pre('save', function(next) {
-  var user = this;
+userModel.pre('save', function preUserSave(next) {
+  const user = this;
 
   if (!user.isModified('password')) {
     return next();
   }
 
   // Hash the dang password
-  bcrypt.hash(user.password, null, null, (err, hash) => {
+  return bcrypt.hash(user.password, null, null, (err, hash) => {
     if (err) {
       return next(err);
     }
 
     user.password = hash;
-    next();
-  })
-})
+    return next();
+  });
+});
 
 module.exports = mongoose.model('User', userModel);

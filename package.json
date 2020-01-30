@@ -5,6 +5,7 @@
   "main": "app.js",
   "scripts": {
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "start": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,7 +16,6 @@
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "express": "^4.16.4",
-    "express-jwt": "^5.3.1",
     "jwt-simple": "^0.5.6",
     "mongoose": "^5.8.10",
     "nodemon": "^2.0.2"
@@ -33,7 +33,8 @@
     "delay": 2500,
     "env": {
       "NODE_ENV": "development",
-      "PORT": 3000
+      "PORT": 3000,
+      "TOKEN_SECRET": "a very secret secret"
     }
   }
 }
