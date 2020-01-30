@@ -1,26 +1,55 @@
-/* eslint-disable no-param-reassign */
 const express = require('express');
+const jwt = require('jwt-simple');
 
 function routes(User) {
-  const userRouter = express.Router();
+  const router = express.Router();
 
-  userRouter.route('/users')
+  router.route('/register')
     .post((req, res) => {
       const user = new User(req.body);
 
-      // TODO validation
-      user.save();
+      // TODO validation and hashing password
+      // name - not empty, minimum length
+      // email - regex to validate email format
+      // password - business rules and restrictions (length, character whitelist, minimum strength)
 
-      return res.status(201).json(user);
-    })
-    .get((req, res) => {
-      User.find((err, books) => {
+      user.save((err, result) => {
         if (err) { return res.send(err); }
-        return res.json(books);
+
+        res.status(201).json(user);
+      });
+    })
+
+  router.route('/login')
+    .post(async (req, res) => {
+      var userData = req.body;
+
+      var user = await User.findOne({ email: userData.email });
+
+      if (!user || userData.password !== user.password) {
+        return res.sendStatus(401).send({ message: 'Email or Password invalid' });
+      }
+
+      // generate token
+      var payload = {};
+      var token = jwt.encode(payload, 'mysecret');  // secret should come from config or something (env?)
+
+      console.log(token);
+
+      res.json({token});
+    })
+
+  // debug -- check list of users
+  router.route('/users')
+    .get(async (req, res) => {
+      await User.find({}, '-password -__v', (err, user) => {
+        if (err) { return res.send(err); }
+        return res.json(user);
       });
     });
 
-  userRouter.use('/users/:userId', (req, res, next) => {
+  // Middleware to find a user by id
+  router.use('/users/:userId', (req, res, next) => {
     User.findById(req.params.userId, (err, user) => {
       if (err) { return res.send(err); }
       if (user) {
@@ -31,7 +60,7 @@ function routes(User) {
     });
   });
 
-  userRouter.route('/users/:userId')
+  router.route('/users/:userId')
     .get((req, res) => res.json(req.user))
     .put((req, res) => {
       const { user } = req;
@@ -77,7 +106,7 @@ function routes(User) {
       });
     });
 
-  return userRouter;
+  return router;
 }
 
 module.exports = routes;
