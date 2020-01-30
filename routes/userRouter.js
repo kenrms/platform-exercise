@@ -35,14 +35,38 @@ function routes(User) {
     .get((req, res) => res.json(req.user))
     .put((req, res) => {
       const { user } = req;
-      
+
       user.name = req.body.name;
       user.email = req.body.email;
       user.password = req.body.password;
       // TODO other fields and validation for updating
 
-      user.save();
-      res.json(user);
+      req.user.save((err) => {
+        if (err) {
+          return res.send(err);
+        }
+        return res.json(user);
+      });
+    })
+    .patch((req, res) => {
+      const { user } = req;
+
+      if (req.body._id) {
+        delete req.body._id;
+      }
+
+      Object.entries(req.body).forEach((item) => {
+        const key = item[0];
+        const value = item[1];
+        user[key] = value;
+      });
+
+      req.user.save((err) => {
+        if (err) {
+          return res.send(err);
+        }
+        return res.json(user);
+      });
     });
 
   return userRouter;
